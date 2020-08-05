@@ -22,6 +22,8 @@ var vm = new Vue({
                 withCredentials:true
             })
             .then(response => {
+
+
                 this.skus = response.data.context.skus;
                 this.freight = response.data.context.freight;
                 this.addresses = response.data.context.addresses;

@@ -12,6 +12,9 @@ from django.shortcuts import render
 # Create your views here.
 from django import http
 from django.views import View
+
+from cats.utils import merge_cart_cookie_to_redis
+from goods.models import SKU
 from users.models import User, Address
 
 
@@ -122,6 +125,7 @@ class LoginView(View):
         response.set_cookie('username',
                                     user.username,
                                     max_age=3600*60*60)
+        response = merge_cart_cookie_to_redis(request=request, user=user, response=response)
         return response
 
 
@@ -553,6 +557,57 @@ class ChangePasswordView(View):
         response.delete_cookie('username')
         return response
 
+
+class UserBrowseHistory(View):
+    """用户浏览记录"""
+    def get(self,request):
+        redis_conn=get_redis_connection('history')
+        sku_ids=redis_conn.lrange('history_%s'%request.user.id,0,-1)
+        skus=[]
+        for sku_id in sku_ids:
+            sku=SKU.objects.get(id=int(sku_id))
+            skus.append({
+                'id':int(sku_id),
+                'name':sku.name,
+                'default_image_url':sku.default_image_url.url,
+                'price':sku.price
+            })
+
+            return JsonResponse({
+                'code':0,
+                'errmsg':'ok',
+                'skus':skus
+            })
+
+
+
+    def post(self,request):
+        "保存用户浏览记录"
+        data=json.loads(request.body.decode())
+        sku_id=data.get('sku_id')
+
+        #查询
+        try:
+            SKU.objects.get(id=sku_id)
+        except Exception as e:
+            return JsonResponse({
+                'code':400,
+                'errmsg':'sku不存在'
+            })
+        #保存到数据库
+        redis_conn=get_redis_connection('history')
+        user_id=request.user.id
+        #去重
+        redis_conn.lrem('history_%s'%user_id,0,sku_id)
+        #存储
+        redis_conn.lpush('history_%s'%user_id,sku_id)
+        #保留5个
+        redis_conn.ltrim('history_%s'%user_id,0,4)
+
+        return JsonResponse({
+            'code':0,
+            'errmsg':'ok'
+        })
 
 
 
