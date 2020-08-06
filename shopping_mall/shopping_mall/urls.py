@@ -23,5 +23,6 @@ urlpatterns = [
      path("",include('oauth.urls')),
     path("",include('areas.urls')),
     path("",include('goods.urls')),
-    path("",include('cats.urls'))
+    path("",include('cats.urls')),
+     path("",include("orders.urls"))
 ]

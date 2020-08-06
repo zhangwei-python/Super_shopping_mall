@@ -299,7 +299,7 @@ class CartsSimpleView(View):
         cart_skus=[]
         sku_ids=cart_dict.keys()
         skus=SKU.objects.filter(id__in=sku_ids)
-        
+
         for sku in skus:
             cart_skus.append({
                 'id':sku.id,
