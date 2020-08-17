@@ -24,5 +24,6 @@ urlpatterns = [
     path("",include('areas.urls')),
     path("",include('goods.urls')),
     path("",include('cats.urls')),
-     path("",include("orders.urls"))
+     path("",include("orders.urls")),
+    path("",include('payment.urls'))
 ]

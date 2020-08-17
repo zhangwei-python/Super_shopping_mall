@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'contents',
     'goods',
     'cats',
-    'orders'
+    'orders',
+    'payment'
 ]
 
 MIDDLEWARE = [
@@ -106,7 +107,15 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', # 数据库引擎
         'HOST': '127.0.0.1', # 数据库主机
         'PORT': 3306, # 数据库端口
-        'USER': 'zhangwei', # 数据库用户名
+        'USER': 'root', # 数据库用户名
+        'PASSWORD': 'mysql', # 数据库用户密码
+        'NAME': 'shopping_mall_db' # 数据库名字
+    },
+    'slave': {
+        'ENGINE': 'django.db.backends.mysql', # 数据库引擎
+        'HOST': '127.0.0.1', # 数据库主机
+        'PORT': 8306, # 数据库端口
+        'USER': 'root', # 数据库用户名
         'PASSWORD': '123456', # 数据库用户密码
         'NAME': 'shopping_mall_db' # 数据库名字
     },
@@ -312,7 +321,7 @@ CRONJOBS = [
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://192.168.85.1:9200/', # Elasticsearch服务器ip地址，端口号固定为9200
+        'URL': 'http://192.168.175.129:9200/', # Elasticsearch服务器ip地址，端口号固定为9200
         'INDEX_NAME': 'meiduo_mall', # Elasticsearch建立的索引库的名称
     },
 }
@@ -322,3 +331,13 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 # 可以在 dev.py 中添加如下代码, 用于决定每页显示数据条数:
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
+
+
+
+
+ALIPAY_APPID = '2021000116688018'
+ALIPAY_DEBUG = True
+ALIPAY_URL = 'https://openapi.alipaydev.com/gateway.do'
+ALIPAY_RETURN_URL = "http://www.meiduo.site:8080/pay_success.html"
+
+# DATABASE_ROUTERS = ['shopping_mall.utils.db_router.MasterSlaveDBRouter']

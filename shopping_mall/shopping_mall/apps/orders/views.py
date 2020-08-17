@@ -111,7 +111,7 @@ class OrderCommitView(View):
                 'code':400,
                 'errmsg':'地址错误'
             })
-        if pay_method not in [0,1]:
+        if pay_method not in [1,2]:
             return JsonResponse({
                 'code':400,
                 'errmsg':'不支持的付款方式'
