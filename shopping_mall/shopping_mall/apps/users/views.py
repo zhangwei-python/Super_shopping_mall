@@ -4,6 +4,7 @@ import re
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.auth import login, authenticate, logout
+from django.utils import timezone
 from django_redis import get_redis_connection
 
 from django.http import JsonResponse
@@ -14,7 +15,7 @@ from django import http
 from django.views import View
 
 from cats.utils import merge_cart_cookie_to_redis
-from goods.models import SKU
+from goods.models import SKU, GoodsVisitCount
 from users.models import User, Address
 
 
@@ -603,6 +604,24 @@ class UserBrowseHistory(View):
         redis_conn.lpush('history_%s'%user_id,sku_id)
         #保留5个
         redis_conn.ltrim('history_%s'%user_id,0,4)
+
+        #补从：当前用户访问的sku的类别商品累加
+        sku=SKU.objects.get(pk=sku_id)
+        category=sku.category
+        try:
+            goods_visit=GoodsVisitCount.objects.get(
+                category_id=category.id,
+                create_time__gte=timezone.localtime().replace(hour=0,minute=0,second=0)
+            )
+        except Exception as e:
+            GoodsVisitCount.objects.create(
+                count=1,
+                category=category
+            )
+        else:
+            goods_visit.count+=1
+            goods_visit.save()
+
 
         return JsonResponse({
             'code':0,

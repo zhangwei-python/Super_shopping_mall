@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
+import datetime
 import os,sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -56,7 +56,8 @@ INSTALLED_APPS = [
     'goods',
     'cats',
     'orders',
-    'payment'
+    'payment',
+    'meiduo_admin'
 ]
 
 MIDDLEWARE = [
@@ -244,8 +245,11 @@ LOGGING = {
 
 CORS_ORIGIN_WHITELIST = (
     'http://127.0.0.1:8080',
+    'http://127.0.0.1:8081',
+
     'http://localhost:8080',
     'http://www.meiduo.site:8080',
+     'http://www.meiduo.site:8081'
 )
 CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
@@ -321,7 +325,7 @@ CRONJOBS = [
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
-        'URL': 'http://192.168.175.129:9200/', # Elasticsearch服务器ip地址，端口号固定为9200
+        'URL': 'http://192.168.85.1:9200/', # Elasticsearch服务器ip地址，端口号固定为9200
         'INDEX_NAME': 'meiduo_mall', # Elasticsearch建立的索引库的名称
     },
 }
@@ -341,3 +345,17 @@ ALIPAY_URL = 'https://openapi.alipaydev.com/gateway.do'
 ALIPAY_RETURN_URL = "http://www.meiduo.site:8080/pay_success.html"
 
 # DATABASE_ROUTERS = ['shopping_mall.utils.db_router.MasterSlaveDBRouter']
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=1),#jwt签发有效期
+    'JWT_RESPONSE_PAYLOAD_HANDLER':'meiduo_admin.utils.my_jwt_response_payload_handler'
+}
